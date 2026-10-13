@@ -1,8 +1,9 @@
 from __future__ import absolute_import
 from matplotlib import pyplot as plt
+from sklearn.model_selection import learning_curve
 from preprocess import get_data, get_next_batch
 #from cnn import CNN
-#from mlp import MLP
+from mlp import MLP
 
 import os
 import tensorflow as tf
@@ -150,7 +151,8 @@ def main():
 
     # TODO: assignment.main() pt 2
     # Initialize your model and optimizer
-
+    model = MLP(classes)
+    optimizer = tf.keras.optimizers.Adam(learning_rate=1e-3)
 
 
     # TODO: assignment.main() pt 3
