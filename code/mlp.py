@@ -33,7 +33,7 @@ class MLP(CifarModel):
         self.hidden_layer_size = 128
 
         # TODO mlp.MLP.__init__(): Initialize your Layers here.
-        self.flatten = tf.keras.layers.flatten()
+        self.flatten = tf.keras.layers.Flatten()
         self.dense1 = tf.keras.layers.Dense(self.hidden_layer_size, activation='relu')
         self.dense2 = tf.keras.layers.Dense(self.num_classes)
 
@@ -48,7 +48,5 @@ class MLP(CifarModel):
         x = self.flatten(inputs) #(num images, 3072)
         x = self.dense1(x) #(num images, 128)
         logits = self.dense2(x) #(num images, 3)
-
-        print(logits.shape)
 
         return logits

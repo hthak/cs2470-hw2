@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 from matplotlib import pyplot as plt
-from sklearn.model_selection import learning_curve
+#from sklearn.model_selection import learning_curve
 from preprocess import get_data, get_next_batch
 #from cnn import CNN
 from mlp import MLP
@@ -30,7 +30,30 @@ def train(model, optimizer, train_inputs, train_labels):
     :return: None
     '''
     #TODO: Implement the training loop
-    raise NotImplementedError
+
+    #shuffle dataset
+    random_indices = tf.random.shuffle(tf.range(len(train_inputs)))
+    train_inputs = tf.gather(train_inputs, random_indices)
+    train_labels = tf.gather(train_labels, random_indices) #based of random_indices so labels stay same for data
+
+    #put into batches
+    for start in range(0, len(train_inputs), model.batch_size):
+        end = start + model.batch_size
+        batch_inputs = train_inputs[start:end]
+        batch_labels = train_labels[start:end]
+
+        #forward pass
+        with tf.GradientTape() as tape:
+            logits = model(batch_inputs)
+            loss = model.loss(logits, batch_labels)
+
+        #backwards
+        gradients = tape.gradient(loss, model.trainable_variables)
+
+        #update weights
+        optimizer.apply_gradients(zip(gradients, model.trainable_variables))
+
+        model.loss_list.append(float(loss.numpy()))
 
 
 def test(model, test_inputs, test_labels):
@@ -47,7 +70,29 @@ def test(model, test_inputs, test_labels):
         test preds - all of the model's predictions for each of the test inputs
     """
     # TODO: Implement the testing loop
-    raise NotImplementedError
+    total_corr = 0
+    total_images = 0
+    predictions = []
+
+    for start in range(0, len(test_inputs), model.batch_size):
+        end = start + model.batch_size
+        batch_inputs = test_inputs[start:end]
+        batch_labels = test_labels[start:end]
+
+        #forward
+        logits = model(batch_inputs)
+
+        #batch accuracy
+        batch_accuracy = model.accuracy(logits, batch_labels)
+        total_corr += float(batch_accuracy.numpy()) * len(batch_inputs)
+        total_images += len(batch_inputs)
+
+        #save predictions
+        predictions.append(logits.numpy())
+
+    test_acc = total_corr / total_images
+    test_pred = np.concatenate(predictions, axis=0)
+    return test_acc, test_pred
 
 def visualize_loss(losses):
     """
@@ -144,22 +189,31 @@ def main():
     train_inputs, train_labels = get_data(LOCAL_TRAIN_FILE, classes)
     test_inputs, test_labels = get_data(LOCAL_TEST_FILE, classes)
 
-    print(train_inputs.shape)
+    '''print(train_inputs.shape)
     print(train_labels.shape)
     print(test_inputs.shape)
-    print(test_labels.shape)
+    print(test_labels.shape)'''
 
     # TODO: assignment.main() pt 2
     # Initialize your model and optimizer
     model = MLP(classes)
     optimizer = tf.keras.optimizers.Adam(learning_rate=1e-3)
 
+    sample_images = train_inputs[:64]
+    sample_labels = train_labels[:64]
+    logits = model(sample_images)
 
     # TODO: assignment.main() pt 3
     # Train your model
+    epochs = 10
+    for epoch in range(epochs):
+        train(model, optimizer, train_inputs, train_labels)
+        print(f"Epoch {epoch + 1}/{epochs} completed")
 
     # TODO: assignment.main() pt 4
     # Test your model
+    test_acc, test_pred = test(model, test_inputs, test_labels)
+    print("test accuracy: ", test_acc)
 
     # TODO: assignment.main() pt 5
     # Save your predictions as either "predictions_cnn.npy" or "predictions_mlp.npy"
