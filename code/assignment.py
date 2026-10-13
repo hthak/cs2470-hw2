@@ -1,8 +1,8 @@
 from __future__ import absolute_import
 from matplotlib import pyplot as plt
 from preprocess import get_data, get_next_batch
-from cnn import CNN
-from mlp import MLP
+#from cnn import CNN
+#from mlp import MLP
 
 import os
 import tensorflow as tf
@@ -40,7 +40,7 @@ def test(model, test_inputs, test_labels):
     shape (num_inputs, width, height, num_channels)
     :param test_labels: test labels (all corresponding labels),
     shape (num_labels, num_classes)
-    :return: 
+    :return:
         test accuracy - this should be the average accuracy across
     all batches
         test preds - all of the model's predictions for each of the test inputs
@@ -122,10 +122,10 @@ def main():
 
     Consider printing the loss, training accuracy, and testing accuracy after each epoch
     to ensure the model is training correctly.
-    
-    Students should receive a final accuracy 
+
+    Students should receive a final accuracy
     on the testing examples for cat, deer and dog of >=75%.
-    
+
     :return: None
     '''
     # TODO: Use the autograder filepaths to get data before submitting to autograder.
@@ -133,16 +133,25 @@ def main():
     AUTOGRADER_TRAIN_FILE = '../data/train'
     AUTOGRADER_TEST_FILE = '../data/test'
 
-    LOCAL_TRAIN_FILE = ...
-    LOCAL_TEST_FILE = ...
+    LOCAL_TRAIN_FILE = 'data/train'
+    LOCAL_TEST_FILE = 'data/test'
 
     classes = [3,4,5] # classes for cat, deer, & dog
 
     # TODO: assignment.main() pt 1
     # Load your testing and training data using the get_data function
+    train_inputs, train_labels = get_data(LOCAL_TRAIN_FILE, classes)
+    test_inputs, test_labels = get_data(LOCAL_TEST_FILE, classes)
+
+    print(train_inputs.shape)
+    print(train_labels.shape)
+    print(test_inputs.shape)
+    print(test_labels.shape)
 
     # TODO: assignment.main() pt 2
     # Initialize your model and optimizer
+
+
 
     # TODO: assignment.main() pt 3
     # Train your model
