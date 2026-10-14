@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+from multiprocessing import pool
 from matplotlib import pyplot as plt
 from preprocess import get_data, get_next_batch
 from manual_convolution import ManualConv2d
@@ -27,9 +28,9 @@ class CNN(CifarModel):
         # Initialize all hyperparameters
         self.loss_list = []
         self.batch_size = 64
-        self.input_width = ???
-        self.input_height = ???
-        self.image_channels = ???
+        self.input_width = 32
+        self.input_height = 32
+        self.image_channels = 3
         self.num_classes = len(classes)
 
         self.hidden_layer_size = 320
@@ -37,6 +38,14 @@ class CNN(CifarModel):
         self.epsilon = 1e-3  # this is used for batch normalization only!
 
         # Fill the rest of this out!
+        self.conv1 = tf.keras.layers.Conv2D(filters=32, kernel_size=3, activation='relu', strides=1, padding='same')
+        self.pool1 = tf.keras.layers.MaxPool2D(pool_size=2)
+        self.conv2 = tf.keras.layers.Conv2D(filters=64, kernel_size=3, activation='relu', strides=1, padding='same')
+        self.pool2 = tf.keras.layers.MaxPool2D(pool_size=2)
+        self.flatten = tf.keras.layers.Flatten()
+        #fully connected layers
+        self.dense1 = tf.keras.layers.Dense(self.hidden_layer_size, activation="relu")
+        self.dense2 = tf.keras.layers.Dense(self.num_classes)
 
     def call(self, inputs, is_testing=False):
         """
@@ -50,4 +59,13 @@ class CNN(CifarModel):
         # shape of filter = (filter_height, filter_width, in_channels, out_channels)
         # shape of strides = (batch_stride, height_stride, width_stride, channels_stride)
 
-        raise NotImplementedError("Implement me!")
+        x = self.conv1(inputs)
+        x = self.pool1(x)
+        x = self.conv2(x)
+        x = self.pool2(x)
+        x = self.flatten(x)
+        x = self.dense1(x)
+        logits = self.dense2(x)
+
+        return logits
+

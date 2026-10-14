@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from matplotlib import pyplot as plt
 #from sklearn.model_selection import learning_curve
 from preprocess import get_data, get_next_batch
-#from cnn import CNN
+from cnn import CNN
 from mlp import MLP
 
 import os
@@ -221,6 +221,11 @@ def main():
     #   depending on which model you are using
     # You will submit these prediction files to the autograder with predictions
     #    For the CAT, DEER, and DOG classes
+    model = CNN(classes)
+    for epoch in range(epochs):
+        train(model, optimizer, train_inputs, train_labels)
+        print(f"Epoch {epoch + 1}/{epochs} completed")
+    np.save("predictions_cnn.npy", test_pred)
     return
 
 
