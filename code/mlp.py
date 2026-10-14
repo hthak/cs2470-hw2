@@ -34,8 +34,11 @@ class MLP(CifarModel):
 
         # TODO mlp.MLP.__init__(): Initialize your Layers here.
         self.flatten = tf.keras.layers.Flatten()
-        self.dense1 = tf.keras.layers.Dense(self.hidden_layer_size, activation='relu')
-        self.dense2 = tf.keras.layers.Dense(self.num_classes)
+        self.dense1 = tf.keras.layers.Dense(256, activation='relu')
+        #self.dropout1 = tf.keras.layers.Dropout(0.3)
+        self.dense2 = tf.keras.layers.Dense(128, activation="relu")
+        #self.dropout2 = tf.keras.layers.Dropout(0.2)
+        self.dense3 = tf.keras.layers.Dense(self.num_classes)
 
     def call(self, inputs, is_testing=False):
         """
@@ -47,6 +50,9 @@ class MLP(CifarModel):
         # TODO mlp.MLP.call(): Implement your forward pass here.
         x = self.flatten(inputs) #(num images, 3072)
         x = self.dense1(x) #(num images, 128)
-        logits = self.dense2(x) #(num images, 3)
+        #x = self.dropout1(x, training=not is_testing)
+        x = self.dense2(x)
+        #x = self.dropout2(x, training=not is_testing)
+        logits = self.dense3(x) #(num images, 3)
 
         return logits

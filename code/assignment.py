@@ -44,7 +44,7 @@ def train(model, optimizer, train_inputs, train_labels):
 
         #forward pass
         with tf.GradientTape() as tape:
-            logits = model(batch_inputs)
+            logits = model(batch_inputs, is_testing=False)
             loss = model.loss(logits, batch_labels)
 
         #backwards
@@ -80,7 +80,7 @@ def test(model, test_inputs, test_labels):
         batch_labels = test_labels[start:end]
 
         #forward
-        logits = model(batch_inputs)
+        logits = model(batch_inputs, is_testing=True)
 
         #batch accuracy
         batch_accuracy = model.accuracy(logits, batch_labels)
@@ -199,9 +199,9 @@ def main():
     model = MLP(classes)
     optimizer = tf.keras.optimizers.Adam(learning_rate=1e-3)
 
-    sample_images = train_inputs[:64]
+    '''sample_images = train_inputs[:64]
     sample_labels = train_labels[:64]
-    logits = model(sample_images)
+    logits = model(sample_images)'''
 
     # TODO: assignment.main() pt 3
     # Train your model
@@ -214,6 +214,7 @@ def main():
     # Test your model
     test_acc, test_pred = test(model, test_inputs, test_labels)
     print("test accuracy: ", test_acc)
+    np.save("predictions_nlp.npy", test_pred)
 
     # TODO: assignment.main() pt 5
     # Save your predictions as either "predictions_cnn.npy" or "predictions_mlp.npy"
