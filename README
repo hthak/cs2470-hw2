@@ -1,5 +1,5 @@
 ## RESULTS:
-- MLP Test Accuracy: 58.80%
+- MLP Test Accuracy: 59.03%
 - CNN Test Accuracy: 79.83%
 - Passed manual convolutional tests
 
