@@ -35,7 +35,7 @@ class MLP(CifarModel):
         # TODO mlp.MLP.__init__(): Initialize your Layers here.
         self.flatten = tf.keras.layers.Flatten()
         self.dense1 = tf.keras.layers.Dense(256, activation="relu")
-        self.dense2 = tf.keras.layers.Dense(128, activation="relu")
+        self.dense2 = tf.keras.layers.Dense(256, activation="relu")
         self.dense3 = tf.keras.layers.Dense(self.num_classes)
 
     def call(self, inputs, is_testing=False):

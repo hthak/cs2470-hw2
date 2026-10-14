@@ -40,8 +40,9 @@ def train(model, optimizer, train_inputs, train_labels):
     for start in range(0, len(train_inputs), model.batch_size):
         end = start + model.batch_size
         batch_inputs = train_inputs[start:end]
-        if isinstance(model, CNN): #only do it for cnn
-            batch_inputs = tf.image.random_flip_left_right(batch_inputs)
+        '''if isinstance(model, CNN): #only do it for cnn
+            batch_inputs = tf.image.random_flip_left_right(batch_inputs)'''
+        batch_inputs = tf.image.random_flip_left_right(batch_inputs)
         batch_labels = train_labels[start:end]
 
         #forward pass
@@ -217,6 +218,7 @@ def main():
     mlp_acc, mlp_pred = test(mlp, test_inputs, test_labels)
     print("mlp test accuracy: ", mlp_acc)
     np.save("predictions_mlp.npy", mlp_pred)
+    return
 
 
     # TODO: assignment.main() pt 5
