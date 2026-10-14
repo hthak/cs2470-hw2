@@ -196,8 +196,8 @@ def main():
 
     # TODO: assignment.main() pt 2
     # Initialize your model and optimizer
-    model = MLP(classes)
-    optimizer = tf.keras.optimizers.Adam(learning_rate=1e-3)
+    mlp = MLP(classes)
+    mlp_optimizer = tf.keras.optimizers.Adam(learning_rate=1e-3)
 
     '''sample_images = train_inputs[:64]
     sample_labels = train_labels[:64]
@@ -207,25 +207,28 @@ def main():
     # Train your model
     epochs = 10
     for epoch in range(epochs):
-        train(model, optimizer, train_inputs, train_labels)
+        train(mlp, mlp_optimizer, train_inputs, train_labels)
         print(f"Epoch {epoch + 1}/{epochs} completed")
 
     # TODO: assignment.main() pt 4
     # Test your model
-    test_acc, test_pred = test(model, test_inputs, test_labels)
-    print("test accuracy: ", test_acc)
-    np.save("predictions_nlp.npy", test_pred)
+    mlp_acc, mlp_pred = test(mlp, test_inputs, test_labels)
+    print("mlp test accuracy: ", mlp_acc)
+    np.save("predictions_nlp.npy", mlp_pred)
 
     # TODO: assignment.main() pt 5
     # Save your predictions as either "predictions_cnn.npy" or "predictions_mlp.npy"
     #   depending on which model you are using
     # You will submit these prediction files to the autograder with predictions
     #    For the CAT, DEER, and DOG classes
-    model = CNN(classes)
+    cnn = CNN(classes)
+    cnn_optimizer = tf.keras.optimizers.Adam(learning_rate=1e-3)
     for epoch in range(epochs):
-        train(model, optimizer, train_inputs, train_labels)
+        train(cnn, cnn_optimizer, train_inputs, train_labels)
         print(f"Epoch {epoch + 1}/{epochs} completed")
-    np.save("predictions_cnn.npy", test_pred)
+    cnn_acc, cnn_pred = test(cnn, test_inputs, test_labels)
+    print("cnn test accuracy: ", cnn_acc)
+    np.save("predictions_cnn.npy", cnn_pred)
     return
 
 
