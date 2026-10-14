@@ -188,8 +188,8 @@ def main():
 
     # TODO: assignment.main() pt 1
     # Load your testing and training data using the get_data function
-    train_inputs, train_labels = get_data(LOCAL_TRAIN_FILE, classes)
-    test_inputs, test_labels = get_data(LOCAL_TEST_FILE, classes)
+    train_inputs, train_labels = get_data(AUTOGRADER_TRAIN_FILE, classes)
+    test_inputs, test_labels = get_data(AUTOGRADER_TEST_FILE, classes)
 
     '''print(train_inputs.shape)
     print(train_labels.shape)
@@ -198,26 +198,26 @@ def main():
 
     # TODO: assignment.main() pt 2
     # Initialize your model and optimizer
+    cnn_epochs = 15
     mlp = MLP(classes)
-    mlp_optimizer = tf.keras.optimizers.Adam(learning_rate=5e-4)
+    mlp_optimizer = tf.keras.optimizers.Adam(learning_rate=1e-3)
 
-    '''sample_images = train_inputs[:64]
-    sample_labels = train_labels[:64]
-    logits = model(sample_images)'''
 
     # TODO: assignment.main() pt 3
     # Train your model
-    mlp_epochs = 12
-    cnn_epochs = 10
+    mlp_epochs = 18
+
     for epoch in range(mlp_epochs):
         train(mlp, mlp_optimizer, train_inputs, train_labels)
         print(f"Epoch {epoch + 1}/{mlp_epochs} completed")
+
 
     # TODO: assignment.main() pt 4
     # Test your model
     mlp_acc, mlp_pred = test(mlp, test_inputs, test_labels)
     print("mlp test accuracy: ", mlp_acc)
     np.save("predictions_mlp.npy", mlp_pred)
+
 
     # TODO: assignment.main() pt 5
     # Save your predictions as either "predictions_cnn.npy" or "predictions_mlp.npy"
@@ -228,7 +228,7 @@ def main():
     cnn_optimizer = tf.keras.optimizers.Adam(learning_rate=1e-3)
 
     #temp
-    sample_images = train_inputs[:4]
+    '''sample_images = train_inputs[:4]
 
     normal_output = cnn(sample_images, is_testing=False)
     manual_output = cnn(sample_images, is_testing=True)
@@ -239,8 +239,8 @@ def main():
     print(
         "Maximum output difference:",
         tf.reduce_max(tf.abs(normal_output - manual_output)).numpy()
-    )
-    
+    )'''
+
     for epoch in range(cnn_epochs):
         train(cnn, cnn_optimizer, train_inputs, train_labels)
         print(f"Epoch {epoch + 1}/{cnn_epochs} completed")

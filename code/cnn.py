@@ -39,14 +39,28 @@ class CNN(CifarModel):
         self.epsilon = 1e-3  # this is used for batch normalization only!
 
         # Fill the rest of this out!
-        self.conv1 = tf.keras.layers.Conv2D(filters=32, kernel_size=3, activation='relu', strides=1, padding='same')
+        '''self.conv1 = tf.keras.layers.Conv2D(filters=32, kernel_size=3, activation='relu', strides=1, padding='same')
         self.pool1 = tf.keras.layers.MaxPool2D(pool_size=2)
+        #self.bn1 = tf.keras.layers.BatchNormalization()
         self.conv2 = tf.keras.layers.Conv2D(filters=64, kernel_size=3, activation='relu', strides=1, padding='same')
         self.pool2 = tf.keras.layers.MaxPool2D(pool_size=2)
+        self.conv3 = tf.keras.layers.Conv2D(filters=128, kernel_size=3, strides=1, padding="same", activation='relu')
         self.flatten = tf.keras.layers.Flatten()
         #fully connected layers
         self.dense1 = tf.keras.layers.Dense(self.hidden_layer_size, activation="relu")
+        self.dense2 = tf.keras.layers.Dense(self.num_classes)'''
+
+        self.conv1 = tf.keras.layers.Conv2D(filters=32, kernel_size=3, padding="same", strides=1, activation="relu")
+        self.conv2 = tf.keras.layers.Conv2D(filters=32, kernel_size=3, padding="same", strides=1, activation="relu")
+        self.pool1 = tf.keras.layers.MaxPool2D(pool_size=2)
+        self.conv3 = tf.keras.layers.Conv2D(filters=64, kernel_size=3, padding="same", strides=1, activation="relu")
+        self.conv4 = tf.keras.layers.Conv2D(filters=64, kernel_size=3, padding="same", strides=1, activation="relu")
+        self.pool2 = tf.keras.layers.MaxPool2D(pool_size=2)
+        self.conv5 = tf.keras.layers.Conv2D(filters=128, kernel_size=3, padding="same", strides=1, activation="relu")
+        self.flatten = tf.keras.layers.Flatten()
+        self.dense1 = tf.keras.layers.Dense(256, activation="relu")
         self.dense2 = tf.keras.layers.Dense(self.num_classes)
+
 
     def call(self, inputs, is_testing=False):
         """
@@ -61,18 +75,29 @@ class CNN(CifarModel):
         # shape of strides = (batch_stride, height_stride, width_stride, channels_stride)
 
         if is_testing:
-            manual_conv = ManualConv2d(filter_shape=list(self.conv1.kernal.shape), strides=[1,1,1,1], padding="SAME", use_bias=self.conv1.use_bias,trainable=False)
-            manual_conv.set_weights(self.conv1.kernal, self.conv1.bias if self.conv1.use_bias else None)
+            manual_conv = ManualConv2d(filter_shape=list(self.conv1.kernel.shape), strides=[1,1,1,1], padding="SAME", use_bias=self.conv1.use_bias,trainable=False)
+            manual_conv.set_weights(self.conv1.kernel, self.conv1.bias if self.conv1.use_bias else None)
 
             x = manual_conv(inputs)
 
             x = tf.nn.relu(x)
         else:
             x = self.conv1(inputs)
+            #x = self.bn1(x, training=not is_testing)
 
-        x = self.pool1(x)
+        '''x = self.pool1(x)
         x = self.conv2(x)
         x = self.pool2(x)
+        x = self.conv3(x)
+        x = self.flatten(x)
+        x = self.dense1(x)
+        logits = self.dense2(x)'''
+        x = self.conv2(x)
+        x = self.pool1(x)
+        x = self.conv3(x)
+        x = self.conv4(x)
+        x = self.pool2(x)
+        x = self.conv5(x)
         x = self.flatten(x)
         x = self.dense1(x)
         logits = self.dense2(x)
