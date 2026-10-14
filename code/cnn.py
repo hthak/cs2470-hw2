@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 from multiprocessing import pool
 from matplotlib import pyplot as plt
+from torch import manual_seed
 from preprocess import get_data, get_next_batch
 from manual_convolution import ManualConv2d
 from base_model import CifarModel
@@ -59,7 +60,16 @@ class CNN(CifarModel):
         # shape of filter = (filter_height, filter_width, in_channels, out_channels)
         # shape of strides = (batch_stride, height_stride, width_stride, channels_stride)
 
-        x = self.conv1(inputs)
+        if is_testing:
+            manual_conv = ManualConv2d(filter_shape=list(self.conv1.kernal.shape), strides=[1,1,1,1], padding="SAME", use_bias=self.conv1.use_bias,trainable=False)
+            manual_conv.set_weights(self.conv1.kernal, self.conv1.bias if self.conv1.use_bias else None)
+
+            x = manual_conv(inputs)
+
+            x = tf.nn.relu(x)
+        else:
+            x = self.conv1(inputs)
+
         x = self.pool1(x)
         x = self.conv2(x)
         x = self.pool2(x)

@@ -40,6 +40,8 @@ def train(model, optimizer, train_inputs, train_labels):
     for start in range(0, len(train_inputs), model.batch_size):
         end = start + model.batch_size
         batch_inputs = train_inputs[start:end]
+        if isinstance(model, CNN): #only do it for cnn
+            batch_inputs = tf.image.random_flip_left_right(batch_inputs)
         batch_labels = train_labels[start:end]
 
         #forward pass
@@ -197,7 +199,7 @@ def main():
     # TODO: assignment.main() pt 2
     # Initialize your model and optimizer
     mlp = MLP(classes)
-    mlp_optimizer = tf.keras.optimizers.Adam(learning_rate=1e-3)
+    mlp_optimizer = tf.keras.optimizers.Adam(learning_rate=5e-4)
 
     '''sample_images = train_inputs[:64]
     sample_labels = train_labels[:64]
@@ -205,16 +207,17 @@ def main():
 
     # TODO: assignment.main() pt 3
     # Train your model
-    epochs = 10
-    for epoch in range(epochs):
+    mlp_epochs = 12
+    cnn_epochs = 10
+    for epoch in range(mlp_epochs):
         train(mlp, mlp_optimizer, train_inputs, train_labels)
-        print(f"Epoch {epoch + 1}/{epochs} completed")
+        print(f"Epoch {epoch + 1}/{mlp_epochs} completed")
 
     # TODO: assignment.main() pt 4
     # Test your model
     mlp_acc, mlp_pred = test(mlp, test_inputs, test_labels)
     print("mlp test accuracy: ", mlp_acc)
-    np.save("predictions_nlp.npy", mlp_pred)
+    np.save("predictions_mlp.npy", mlp_pred)
 
     # TODO: assignment.main() pt 5
     # Save your predictions as either "predictions_cnn.npy" or "predictions_mlp.npy"
@@ -223,9 +226,25 @@ def main():
     #    For the CAT, DEER, and DOG classes
     cnn = CNN(classes)
     cnn_optimizer = tf.keras.optimizers.Adam(learning_rate=1e-3)
-    for epoch in range(epochs):
+
+    #temp
+    sample_images = train_inputs[:4]
+
+    normal_output = cnn(sample_images, is_testing=False)
+    manual_output = cnn(sample_images, is_testing=True)
+
+    print("Normal shape:", normal_output.shape)
+    print("Manual shape:", manual_output.shape)
+
+    print(
+        "Maximum output difference:",
+        tf.reduce_max(tf.abs(normal_output - manual_output)).numpy()
+    )
+    
+    for epoch in range(cnn_epochs):
         train(cnn, cnn_optimizer, train_inputs, train_labels)
-        print(f"Epoch {epoch + 1}/{epochs} completed")
+        print(f"Epoch {epoch + 1}/{cnn_epochs} completed")
+
     cnn_acc, cnn_pred = test(cnn, test_inputs, test_labels)
     print("cnn test accuracy: ", cnn_acc)
     np.save("predictions_cnn.npy", cnn_pred)

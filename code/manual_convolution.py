@@ -32,7 +32,7 @@ class ManualConv2d(tf.keras.layers.Layer):
         if self.bias is not None: return self.filters, self.bias
         return self.filters
 
-    def set_weights(self, filters, bias=None): 
+    def set_weights(self, filters, bias=None):
         self.filters = filters
         if bias is not None: self.bias = bias
 
@@ -46,3 +46,52 @@ class ManualConv2d(tf.keras.layers.Layer):
         filter_height, filter_width, filter_in_channels, filter_out_channels = self.filters.shape
 
         # fill out the rest!
+        assert input_in_channels == filter_in_channels
+        assert self.strides == [1, 1, 1, 1]
+
+        #padding stuff
+        if self.padding == "SAME":
+            pad_y = filter_height - 1
+            pad_x = filter_width - 1
+        else:
+            pad_y = 0
+            pad_x = 0
+
+        #subtracting for odd padding
+        pad_top = pad_y // 2
+        pad_bottom = pad_y - pad_top
+        pad_left = pad_x // 2
+        pad_right = pad_x - pad_left
+
+        #batch, height, width, channels
+        padded_inputs = tf.pad(inputs, [[0, 0], [pad_top, pad_bottom], [pad_left, pad_right], [0,0]])
+
+        #according to slides
+        out_height = in_height + pad_y - filter_height + 1
+        out_width = in_width + pad_x - filter_width + 1
+
+        #filter multiplication
+        output_rows = []
+        for y in range(out_height):
+            output_cols = []
+            for x in range(out_width):
+                #get the valid filter region to multiply against
+                region = padded_inputs[
+                    :,
+                    y:y+filter_height,
+                    x:x+filter_width,
+                    :
+                ]
+                #broadcasting
+                products = (tf.expand_dims(region, axis=-1)*(tf.expand_dims(tf.cast(self.filters, tf.float32), axis=0)))
+                values = tf.reduce_sum(products, axis=[1, 2, 3])
+
+                if self.bias is not None:
+                    values = values + tf.cast(self.bias, tf.float32)
+
+                output_cols.append(values)
+
+            output_rows.append(tf.stack(output_cols, axis=1))
+
+        output = tf.stack(output_rows, axis=1)
+        return tf.convert_to_tensor(output, dtype=tf.float32)
